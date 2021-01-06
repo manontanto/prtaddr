@@ -5,35 +5,35 @@ from reportlab.lib.units import inch, mm, cm
 
 GEN_SHIN_GOTHIC = "./fonts/GenShinGothic-P-Light.ttf"
 
-def mk1PDF(l):
-    (pg, post_code, addr, sei, mei, renmei) = l
-    c = canvas.Canvas('card' + pg + '.pdf', pagesize=(100 * mm, 148 * mm))
+def mk1PDF(pg, l):
+    (sei, mei, post_code, addr, renmei) = l
+    c = canvas.Canvas('card' + str(pg) + '.pdf', pagesize=(100 * mm, 148 * mm))
     pdfmetrics.registerFont(TTFont('GenShinGothic', GEN_SHIN_GOTHIC))
     # Create textobject
     textobject = c.beginText()
-    # Set text location (x, y)
+#   郵便番号
     textobject.setTextOrigin(45 * mm, 126 * mm)
     textobject.setFont('GenShinGothic', 20)
-    spacing = 8.4
-    textobject.setCharSpace(spacing)
+    textobject.setCharSpace(8.4)
     textobject.textLine(post_code)
+#   住所
     textobject.setTextOrigin(30 * mm, 90 * mm)
     textobject.setFont('GenShinGothic', 11)
     textobject.setCharSpace(0)
-#    line = '東京都目黒区洗足1-29-2'
     textobject.textLine(addr)
+#   氏名
     textobject.setTextOrigin(30 * mm, 80 * mm)
-#    line = '高野由紀夫'
-    textobject.textLine(sei + mei + '様')
+    textobject.setCharSpace(4)
+    textobject.textLine(sei + ' ' + mei + ' 様')
     if renmei:
-        textobject.textLine(sei + renmei + '様')
+        textobject.textLine(sei + ' ' + renmei + ' 様')
 
     c.drawText(textobject)
     c.save()
 
 if __name__ == '__main__':
-    adrL1 = ['服部', '半蔵', '111-1111', '大江戸区城内西1-1','']
-    adrL2 = ['平', '将門','222-2222', '大江戸区城内東2-2', '御前']
+    adrL1 = ['服部', '半蔵', '1111111', '大江戸区城内西1-1','']
+    adrL2 = ['平', '将門','2222222', '大江戸区城内東2-2', '御前']
     adrL = [ adrL1, adrL2 ]
     count_pg = 1
     for l in adrL:
