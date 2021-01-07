@@ -3,6 +3,14 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.units import inch, mm, cm
 
+import vobject
+from tkinter import filedialog as tkdialog
+import os
+import sys
+
+root = tkdialog.Tk()
+root.withdraw()
+
 GEN_SHIN_GOTHIC = "./fonts/GenShinGothic-P-Light.ttf"
 
 def mk1PDF(pg, l):
@@ -15,14 +23,22 @@ def mk1PDF(pg, l):
     textobject.setTextOrigin(45 * mm, 126 * mm)
     textobject.setFont('GenShinGothic', 20)
     textobject.setCharSpace(8.4)
+    if '-' in post_code:
+        post_code = post_code[0:3] + post_code[4:8]
     textobject.textLine(post_code)
 #   住所
     textobject.setTextOrigin(30 * mm, 90 * mm)
     textobject.setFont('GenShinGothic', 11)
     textobject.setCharSpace(0)
-    textobject.textLine(addr)
+    if ' ' in addr:
+        addr_lines = addr.split()
+        textobject.textLine(addr_lines[0])
+        textobject.textLine(addr_lines[1])
+    else:
+        textobject.textLine(addr)
 #   氏名
-    textobject.setTextOrigin(30 * mm, 80 * mm)
+#    textobject.setTextOrigin(30 * mm, 80 * mm)
+    textobject.moveCursor(0 * mm, 5 * mm)
     textobject.setCharSpace(4)
     textobject.textLine(sei + ' ' + mei + ' 様')
     if renmei:
@@ -31,11 +47,35 @@ def mk1PDF(pg, l):
     c.drawText(textobject)
     c.save()
 
-if __name__ == '__main__':
-    adrL1 = ['服部', '半蔵', '1111111', '大江戸区城内西1-1','']
-    adrL2 = ['平', '将門','2222222', '大江戸区城内東2-2', '御前']
-    adrL = [ adrL1, adrL2 ]
+def readvcf():
+    addr_list = []
+    read_fileName = tkdialog.askopenfilename(filetypes=[('vcf files', '*.vcf')],\
+        initialdir=os.getcwd())
+    if not read_fileName:
+        sys.exit() # null read_fileName
+    with open(read_fileName, 'r') as vcf_file:
+        for vcard in vobject.readComponents(vcf_file):
+            sei = vcard.n.value.family
+            mei = vcard.n.value.given
+            pcode = vcard.adr.value.code
+            addr = vcard.adr.value.region + vcard.adr.value.city \
+                        + vcard.adr.value.street + vcard.adr.value.extended \
+                        + vcard.adr.value.box
+            renmei = ''
+            if hasattr(vcard, 'x_abrelatednames'):
+                renmei = vcard.x_abrelatednames.value
+            addr_list.append([sei, mei, pcode, addr, renmei])
+        return addr_list
+def main():
+#    adrL1 = ['服部', '半蔵', '1111111', '大江戸区城内西1-1','']
+#    adrL2 = ['平', '将門','2222222', '大江戸区城内東2-2', '御前']
+#    adrL = [ adrL1, adrL2 ]
+    addrList = []
+    addrList = readvcf() # global addrList[]がセットされる
     count_pg = 1
-    for l in adrL:
+    for l in addrList:
         mk1PDF(count_pg,l)
         count_pg += 1
+
+if __name__ == '__main__':
+    main()
