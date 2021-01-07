@@ -5,16 +5,21 @@ from reportlab.lib.units import inch, mm, cm
 
 import vobject
 from tkinter import filedialog as tkdialog
-import os, sys
+import os, sys, glob
 
 root = tkdialog.Tk()
 root.withdraw()
 
-GEN_SHIN_GOTHIC = "./fonts/GenShinGothic-P-Light.ttf"
+GEN_SHIN_GOTHIC = "/Users/yukio/Applications/myproj/fonts/GenShinGothic-P-Light.ttf"
+WORK_DIR =  '/Users/yukio/desktop/work/'
+try:
+    os.mkdir(WORK_DIR)  # python3
+except FileExistsError:
+    pass
 
 def mk1PDF(pg, l):
     (sei, mei, post_code, addr, renmei) = l
-    c = canvas.Canvas('card' + str(pg) + '.pdf', pagesize=(100 * mm, 148 * mm))
+    c = canvas.Canvas(WORK_DIR + 'card' + str(pg) + '.pdf', pagesize=(100 * mm, 148 * mm))
     pdfmetrics.registerFont(TTFont('GenShinGothic', GEN_SHIN_GOTHIC))
     # Create textobject
     textobject = c.beginText()
@@ -49,7 +54,7 @@ def mk1PDF(pg, l):
 def readvcf():
     addr_list = []
     read_fileName = tkdialog.askopenfilename(filetypes=[('vcf files', '*.vcf')],\
-        initialdir=os.getcwd())
+        initialdir=os.chdir(WORK_DIR))
     if not read_fileName:
         sys.exit() # null read_fileName
     with open(read_fileName, 'r') as vcf_file:
@@ -67,17 +72,17 @@ def readvcf():
         return addr_list
 
 def combine():
-    import PyPDF2, glob
+    import PyPDF2
     pdf_writer = PyPDF2.PdfFileWriter()
 
     pdf_files = []
-    pdf_files = glob.glob('card*.pdf')
+    pdf_files = glob.glob(WORK_DIR + 'card*.pdf')
     for filename in pdf_files:
         pdf_file_obj = open(filename, 'rb')
         pdf_reader = PyPDF2.PdfFileReader(pdf_file_obj)
         page_obj = pdf_reader.getPage(0)
         pdf_writer.addPage(page_obj)
-    pdf_output = open('combined.pdf', 'wb')
+    pdf_output = open(WORK_DIR + 'combined.pdf', 'wb')
     pdf_writer.write(pdf_output)
     pdf_output.close()
 
@@ -92,6 +97,8 @@ def main():
         mk1PDF(count_pg,l)
         count_pg += 1
     combine()
+    for f in glob.glob(WORK_DIR + 'card*.pdf'):
+        os.remove(f)
 
 if __name__ == '__main__':
     main()
