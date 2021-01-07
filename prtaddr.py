@@ -5,8 +5,7 @@ from reportlab.lib.units import inch, mm, cm
 
 import vobject
 from tkinter import filedialog as tkdialog
-import os
-import sys
+import os, sys
 
 root = tkdialog.Tk()
 root.withdraw()
@@ -66,6 +65,22 @@ def readvcf():
                 renmei = vcard.x_abrelatednames.value
             addr_list.append([sei, mei, pcode, addr, renmei])
         return addr_list
+
+def combine():
+    import PyPDF2, glob
+    pdf_writer = PyPDF2.PdfFileWriter()
+
+    pdf_files = []
+    pdf_files = glob.glob('card*.pdf')
+    for filename in pdf_files:
+        pdf_file_obj = open(filename, 'rb')
+        pdf_reader = PyPDF2.PdfFileReader(pdf_file_obj)
+        page_obj = pdf_reader.getPage(0)
+        pdf_writer.addPage(page_obj)
+    pdf_output = open('combined.pdf', 'wb')
+    pdf_writer.write(pdf_output)
+    pdf_output.close()
+
 def main():
 #    adrL1 = ['服部', '半蔵', '1111111', '大江戸区城内西1-1','']
 #    adrL2 = ['平', '将門','2222222', '大江戸区城内東2-2', '御前']
@@ -76,6 +91,7 @@ def main():
     for l in addrList:
         mk1PDF(count_pg,l)
         count_pg += 1
+    combine()
 
 if __name__ == '__main__':
     main()
