@@ -103,7 +103,7 @@ def main():
     for f in glob.glob(WORK_DIR + 'card*.pdf'):
         os.remove(f)
     k = input('Printer 準備 OK? [Y/n]: ')
-    if k.lower()  not in ['y', 'yes']:
+    if k.lower() not in ['y', 'yes']:
         sys.exit()
     subprocess.run(['lpr', '-P', 'EPSON_EP_707A_Series', WORK_DIR + 'combined.pdf'])
 
