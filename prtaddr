@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 # prtaddr - Print Address to HAGAKI
 #
-# 郵便番号, 住所, 姓, 名, 連名
-# 2021-01-08
+# 2021-01-08 manontanto
 #
+from tkinter import filedialog as tkdialog
+import os
+import sys
+import glob
+import subprocess
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.lib.units import inch, mm, cm
-
+from reportlab.lib.units import mm
 import vobject
-from tkinter import filedialog as tkdialog
-import os, sys, glob
-import subprocess
+import PyPDF2
 
 root = tkdialog.Tk()
 root.withdraw()
@@ -79,7 +80,6 @@ def readvcf():
         return addr_list
 
 def combine():
-    import PyPDF2
     pdf_writer = PyPDF2.PdfFileWriter()
 
     pdf_files = []
@@ -94,9 +94,6 @@ def combine():
     pdf_output.close()
 
 def main():
-#    adrL1 = ['服部', '半蔵', '1111111', '大江戸区城内西1-1','']
-#    adrL2 = ['平', '将門','2222222', '大江戸区城内東2-2', '御前']
-#    adrL = [ adrL1, adrL2 ]
     addrList = []
     addrList = readvcf() # global addrList[]がセットされる
     count_pg = 1
@@ -109,7 +106,7 @@ def main():
     k = input('Printer 準備 OK? [Y/n]: ')
     if k  not in ['y', 'Y', 'yes', 'YES']:
         sys.exit()
-    subprocess.run(['lpr', '-P', 'EPSON_EP_707A_Series', WORK_DIR + 'combined.pdf'])
+    subprocess.run(['lpr', '-P', 'EPSON_EP_707A_Series', WORK_DIR + 'combined.pdf'], check=True)
 
 if __name__ == '__main__':
     main()
