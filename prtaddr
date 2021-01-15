@@ -1,52 +1,33 @@
 #!/usr/bin/env python3
-# prtaddr
+# prtaddr - Print Address to HAGAKI
 #
-# manontanto
+# 2021-01-08 manontanto
 #
+from tkinter import filedialog as tkdialog
+import os
+import sys
+import glob
+import subprocess
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.lib.units import inch, mm, cm
-
+from reportlab.lib.units import mm
 import vobject
-from tkinter import filedialog as tkdialog
-import os, sys, glob
-import subprocess
+import PyPDF2
 
 root = tkdialog.Tk()
 root.withdraw()
 
-GEN_SHIN_GOTHIC = PATH_TO_FONTS + 'GenShinGothic-P-Light.ttf'
-WORK_DIR = PATH_TO_WORK
+GEN_SHIN_GOTHIC = "/Users/yukio/Applications/myproj/fonts/GenShinGothic-P-Light.ttf"
+WORK_DIR =  '/Users/yukio/desktop/work/'
 try:
-    os.mkdir(WORK_DIR)  # for python3
+    os.mkdir(WORK_DIR)  # python3
 except FileExistsError:
     pass
 
-def readvcf():
-    addr_list = []
-    read_fileName = tkdialog.askopenfilename(filetypes=[('vcf files', '*.vcf')],\
-        initialdir=os.chdir(WORK_DIR))
-    if not read_fileName:
-        sys.exit() # null read_fileName
-    with open(read_fileName, 'r') as vcf_file:
-        for vcard in vobject.readComponents(vcf_file):
-            sei = vcard.n.value.family
-            mei = vcard.n.value.given
-            pcode = vcard.adr.value.code
-            addr = vcard.adr.value.region + vcard.adr.value.city \
-                        + vcard.adr.value.street + vcard.adr.value.extended \
-                        + vcard.adr.value.box
-            renmei = ''
-            if hasattr(vcard, 'x_abrelatednames'):
-                renmei = vcard.x_abrelatednames.value
-            addr_list.append([sei, mei, pcode, addr, renmei])
-        return addr_list
-
 def mk1PDF(pg, l):
     (sei, mei, post_code, addr, renmei) = l
-    c = canvas.Canvas(WORK_DIR + 'card' + str(pg) + '.pdf', pagesize=(100 * mm,\
-       148 * mm))
+    c = canvas.Canvas(WORK_DIR + 'card' + str(pg) + '.pdf', pagesize=(100 * mm, 148 * mm))
     pdfmetrics.registerFont(TTFont('GenShinGothic', GEN_SHIN_GOTHIC))
     # Create textobject
     textobject = c.beginText()
@@ -68,6 +49,7 @@ def mk1PDF(pg, l):
     else:
         textobject.textLine(addr)
 #   氏名
+#    textobject.setTextOrigin(30 * mm, 80 * mm)
     textobject.moveCursor(0 * mm, 5 * mm)
     textobject.setCharSpace(4)
     textobject.textLine(sei + ' ' + mei + ' 様')
@@ -77,8 +59,27 @@ def mk1PDF(pg, l):
     c.drawText(textobject)
     c.save()
 
+def readvcf():
+    addr_list = []
+    read_fileName = tkdialog.askopenfilename(filetypes=[('vcf files', '*.vcf')],\
+        initialdir=os.chdir(WORK_DIR))
+    if not read_fileName:
+        sys.exit() # null read_fileName
+    with open(read_fileName, 'r') as vcf_file:
+        for vcard in vobject.readComponents(vcf_file):
+            sei = vcard.n.value.family
+            mei = vcard.n.value.given
+            pcode = vcard.adr.value.code
+            addr = vcard.adr.value.region + vcard.adr.value.city \
+                        + vcard.adr.value.street + vcard.adr.value.extended \
+                        + vcard.adr.value.box
+            renmei = ''
+            if hasattr(vcard, 'x_abrelatednames'):
+                renmei = vcard.x_abrelatednames.value
+            addr_list.append([sei, mei, pcode, addr, renmei])
+        return addr_list
+
 def combine():
-    import PyPDF2
     pdf_writer = PyPDF2.PdfFileWriter()
 
     pdf_files = []
@@ -94,7 +95,7 @@ def combine():
 
 def main():
     addrList = []
-    addrList = readvcf()
+    addrList = readvcf() # global addrList[]がセットされる
     count_pg = 1
     for l in addrList:
         mk1PDF(count_pg,l)
@@ -103,10 +104,9 @@ def main():
     for f in glob.glob(WORK_DIR + 'card*.pdf'):
         os.remove(f)
     k = input('Printer 準備 OK? [Y/n]: ')
-    if k.lower() not in ['y', 'yes']:
+    if k  not in ['y', 'Y', 'yes', 'YES']:
         sys.exit()
-    subprocess.run(['lpr', '-P', 'EPSON_EP_707A_Series', WORK_DIR + 'combined.pdf'])
+    subprocess.run(['lpr', '-P', 'EPSON_EP_707A_Series', WORK_DIR + 'combined.pdf'], check=True)
 
 if __name__ == '__main__':
     main()
-
