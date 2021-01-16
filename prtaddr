@@ -86,7 +86,6 @@ def readcsv(fileName):
     csvファイルを読み，姓・名・郵便番号・住所・連名をリストにする
     読み取るファイルは，この順序の5カラムのみが許容される
     """
-    addr_list = []
     with open(fileName, 'r') as csv_file:
         csv_reader = csv.reader(csv_file)
         l = list(csv_reader)
@@ -101,7 +100,7 @@ def readcsv(fileName):
 
 def combine():
     """ PDFをまとめて1ファイルにしてWORK_DIRに置く"""
-    import PyPDF2
+
     pdf_writer = PyPDF2.PdfFileWriter()
 
     pdf_files = []
