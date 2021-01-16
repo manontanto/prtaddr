@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # prtaddr - Print Address to HAGAKI
 #
-# lm: 2021-01-16
-# 2021-01-08
+# manontanto
 #
 from tkinter import filedialog as tkdialog
 import os
@@ -20,8 +19,8 @@ import PyPDF2
 root = tkdialog.Tk()
 root.withdraw()
 
-GEN_SHIN_GOTHIC = "/Users/yukio/Applications/myproj/fonts/GenShinGothic-P-Light.ttf"
-WORK_DIR =  '/Users/yukio/desktop/work/'
+GEN_SHIN_GOTHIC = PATH_TO_FONTS + 'GenShinGothic-P-Light.ttf'
+WORK_DIR =  PATH_TO_WORK
 try:
     os.mkdir(WORK_DIR)  # python3
 except FileExistsError:
@@ -29,7 +28,8 @@ except FileExistsError:
 
 def mk1PDF(pg, l):
     (sei, mei, post_code, addr, renmei) = l
-    c = canvas.Canvas(WORK_DIR + 'card' + str(pg) + '.pdf', pagesize=(100 * mm, 148 * mm))
+    c = canvas.Canvas(WORK_DIR + 'card' + str(pg) + '.pdf',\
+            pagesize=(100 * mm, 148 * mm))
     pdfmetrics.registerFont(TTFont('GenShinGothic', GEN_SHIN_GOTHIC))
     # Create textobject
     textobject = c.beginText()
@@ -148,7 +148,8 @@ def main():
     k = input('Printer 準備 OK? [Y/n]: ')
     if k.lower()  not in ['y', 'yes']:
         sys.exit()
-    subprocess.run(['lpr', '-P', 'EPSON_EP_707A_Series', WORK_DIR + 'combined.pdf'], check=True)
+    subprocess.run(['lpr', '-P', 'EPSON_EP_707A_Series', WORK_DIR + 'combined.pdf'],\
+            check=True)
 
 if __name__ == '__main__':
     main()
