@@ -20,7 +20,7 @@ root = tkdialog.Tk()
 root.withdraw()
 
 GEN_SHIN_GOTHIC = PATH_TO_FONTS + 'GenShinGothic-P-Light.ttf'
-WORK_DIR =  PATH_TO_WORK
+WORK_DIR = PATH_TO_WORK
 try:
     os.mkdir(WORK_DIR)  # python3
 except FileExistsError:
