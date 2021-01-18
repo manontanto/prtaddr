@@ -79,8 +79,8 @@ def mk1PDF(pg, l):
 
 def readvcf(fileName):
     """
-    vcfファイルを読み，姓・名・郵便番号・住所・連名をリストにする
-    vcfファイルは，Big Sur/連絡先.appの仕様による
+    vcardファイルを読み，姓・名・郵便番号・住所・連名をリストにする
+    vcardファイルは，Big Sur/連絡先.appの仕様による
     """
     addr_list = []
     with open(fileName, 'r') as vcf_file:
