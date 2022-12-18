@@ -21,6 +21,11 @@ root.withdraw()
 
 GEN_SHIN_GOTHIC = PATH_TO_FONTS + 'GenShinGothic-P-Light.ttf'
 WORK_DIR = PATH_TO_WORK
+is_file = os.path.isfile(GEN_SHIN_GOTHIC)
+if not is_file:
+    print(f"PRINT FONT is NOT EXIST: {GEN_SHIN_GOTHIC}")
+    sys.exit()
+
 try:
     os.mkdir(WORK_DIR)  # python3
 except FileExistsError:
@@ -164,8 +169,10 @@ def main():
     k = input('Printer 準備 OK? [y/n]: ')
     if k.lower()  not in ['y', 'yes']:
         sys.exit()
-    subprocess.run(['lpr', '-P', 'EPSON_EP_707A_Series', WORK_DIR + 'combined.pdf'],\
-            check=True)
+#    subprocess.run(['lpr', '-P', 'EPSON_EP_707A_Series',\
+        WORK_DIR + 'combined.pdf'], check=True)
+    subprocess.run(['lpr', '-P', 'Brother_HL-L3230CDW_series', '-o', 'sides=one-sided',\
+            WORK_DIR + 'combined.pdf'], check=True)
 
 if __name__ == '__main__':
     main()
