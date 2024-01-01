@@ -122,15 +122,15 @@ def readcsv(fileName):
 def combine():
     """ PDFをまとめて1ファイルにしてWORK_DIRに置く"""
 
-    pdf_writer = PyPDF2.PdfFileWriter()
+    pdf_writer = PyPDF2.PdfWriter()
 
     pdf_files = []
     pdf_files = glob.glob(WORK_DIR + 'card*.pdf')
     for filename in pdf_files:
         pdf_file_obj = open(filename, 'rb')
-        pdf_reader = PyPDF2.PdfFileReader(pdf_file_obj)
-        page_obj = pdf_reader.getPage(0)
-        pdf_writer.addPage(page_obj)
+        pdf_reader = PyPDF2.PdfReader(pdf_file_obj)
+        page_obj = pdf_reader.pages[0]
+        pdf_writer.add_page(page_obj)
     pdf_output = open(WORK_DIR + 'combined.pdf', 'wb')
     pdf_writer.write(pdf_output)
     pdf_output.close()
